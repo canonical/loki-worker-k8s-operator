@@ -34,17 +34,8 @@ LOKI_CLIENT_CA_FILE = "/etc/loki/ca.cert"
 class LokiRole(str, Enum):
     """Loki component role names."""
 
-    # Based on: https://grafana.com/docs/loki/latest/get-started/components/#loki-components
-    compactor = "compactor"
-    distributor = "distributor"
-    index_gateway = "index-gateway"
-    ingester = "ingester"
-    querier = "querier"
-    query_frontend = "query-frontend"
-    query_scheduler = "query-scheduler"
-    ruler = "ruler"
-
-    # meta-roles
+    # Meta roles based on:
+    # https://grafana.com/docs/loki/latest/get-started/deployment-modes/#simple-scalable
     read = "read"
     write = "write"
     backend = "backend"
@@ -52,14 +43,9 @@ class LokiRole(str, Enum):
 
 
 META_ROLES = {
-    LokiRole.read: (LokiRole.query_frontend, LokiRole.querier),
-    LokiRole.write: (LokiRole.distributor, LokiRole.ingester),
-    LokiRole.backend: (
-        LokiRole.query_scheduler,
-        LokiRole.index_gateway,
-        LokiRole.compactor,
-        LokiRole.ruler,
-    ),
+    LokiRole.read: (LokiRole.read),
+    LokiRole.write: (LokiRole.write),
+    LokiRole.backend: (LokiRole.backend),
     LokiRole.all: list(LokiRole),
 }
 

@@ -71,33 +71,9 @@ resources:
     description: OCI image for Grafana Loki
     upstream-source: docker.io/ubuntu/loki:3.0-22.04
 
-# Based on: https://grafana.com/docs/loki/latest/get-started/components/#loki-components
+# Based on: https://grafana.com/docs/loki/latest/get-started/deployment-modes/#simple-scalable
 config:
   options:
-    compactor:
-      type: boolean
-      default: false
-    distributor:
-      type: boolean
-      default: false
-    index-gateway:
-      type: boolean
-      default: false
-    ingester:
-      type: boolean
-      default: false
-    querier:
-      type: boolean
-      default: false
-    query-frontend:
-      type: boolean
-      default: false
-    query-scheduler:
-      type: boolean
-      default: false
-    ruler:
-      type: boolean
-      default: false
     read:
       type: boolean
       default: false

@@ -38,7 +38,7 @@ from ops import pebble
 from ops.charm import CharmBase, CollectStatusEvent
 from ops.framework import BoundEvent, Object
 from ops.main import main
-from ops.model import ActiveStatus, BlockedStatus, WaitingStatus, OpenedPort
+from ops.model import ActiveStatus, BlockedStatus, OpenedPort, WaitingStatus
 from ops.pebble import PathError, ProtocolError
 
 LOKI_DIR = "/loki"
@@ -60,7 +60,7 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
 
     _name = "loki"
     _instance_addr = "127.0.0.1"
-    _port = "3100"
+    _port = 3100
 
     def __init__(self, *args):
         super().__init__(*args)
@@ -79,15 +79,11 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         self.tracing = TracingEndpointRequirer(self)
 
         # === EVENT HANDLER REGISTRATION === #
-        self.framework.observe(
-            self.on.loki_pebble_ready, self._on_pebble_ready  # pyright: ignore
-        )
+        self.framework.observe(self.on.loki_pebble_ready, self._on_pebble_ready)  # pyright: ignore
         self.framework.observe(self.on.config_changed, self._on_config_changed)
         self.framework.observe(self.on.upgrade_charm, self._on_upgrade_charm)
         self.framework.observe(self.on.collect_unit_status, self._on_collect_status)
-        self.framework.observe(
-            self.loki_cluster.on.config_received, self._on_loki_config_received
-        )
+        self.framework.observe(self.loki_cluster.on.config_received, self._on_loki_config_received)
         self.framework.observe(self.loki_cluster.on.created, self._on_loki_cluster_created)
         self.framework.observe(
             self.on.loki_cluster_relation_departed, self.log_forwarder.disable_logging
@@ -95,7 +91,6 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         self.framework.observe(
             self.on.loki_cluster_relation_broken, self.log_forwarder.disable_logging
         )
-
 
     # === EVENT HANDLERS === #
     def _on_pebble_ready(self, _):
@@ -134,7 +129,6 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
 
     def _on_loki_config_received(self, _e: ConfigReceivedEvent):
         self._update_config()
-
 
     # === PROPERTIES === #
 
@@ -194,6 +188,9 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         self.loki_cluster.publish_unit_address(socket.getfqdn())
         if self.unit.is_leader() and self._loki_roles:
             logger.info(f"publishing roles: {self._loki_roles}")
+            print("*" * 100)
+            print(self._loki_roles)
+            print("*" * 100)
             self.loki_cluster.publish_app_roles(self._loki_roles)
 
     def _update_config(self):

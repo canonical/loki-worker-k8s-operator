@@ -42,12 +42,7 @@ class LokiRole(str, Enum):
     all = "all"
 
 
-META_ROLES = {
-    LokiRole.read: (LokiRole.read),
-    LokiRole.write: (LokiRole.write),
-    LokiRole.backend: (LokiRole.backend),
-    LokiRole.all: list(LokiRole),
-}
+META_ROLES = {}
 
 
 def expand_roles(roles: Iterable[LokiRole]) -> Set[LokiRole]:

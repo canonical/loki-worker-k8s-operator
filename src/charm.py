@@ -188,9 +188,6 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         self.loki_cluster.publish_unit_address(socket.getfqdn())
         if self.unit.is_leader() and self._loki_roles:
             logger.info(f"publishing roles: {self._loki_roles}")
-            print("*" * 100)
-            print(self._loki_roles)
-            print("*" * 100)
             self.loki_cluster.publish_app_roles(self._loki_roles)
 
     def _update_config(self):

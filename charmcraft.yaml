@@ -36,6 +36,9 @@ parts:
 requires:
   loki-cluster:
     interface: loki_cluster
+    description: |
+      The requested set of roles for of the worker (this charm) is requested by
+      the coordinator over relation data.
     limit: 1
 
   tracing:

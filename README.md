@@ -10,7 +10,3 @@ The Loki Worker charm provides a scalable long-term storage using [Loki](https:/
 This charm is part of the Loki HA deployment, and is meant to be deployed together with the [loki-coordinator-k8s](https://github.com/canonical/loki-coordinator-k8s-operator) charm.
 
 A Loki Worker can assume any role that the Loki binary can take on, and it should always be related to a Loki Coordinator.
-
-## OCI Images
-
-This charm by default uses the latest release of the [ubuntu/loki](https://hub.docker.com/r/ubuntu/loki/) image.

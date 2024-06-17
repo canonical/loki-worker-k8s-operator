@@ -16,8 +16,6 @@ from typing import Dict, List, Optional
 
 import yaml
 from charms.loki_k8s.v1.loki_push_api import _PebbleLogClient
-from charms.tempo_k8s.v1.charm_tracing import trace_charm
-from charms.tempo_k8s.v1.tracing import TracingEndpointRequirer
 from cosl import JujuTopology
 from loki_cluster import (
     LOKI_CERT_FILE,
@@ -32,28 +30,17 @@ from ops import pebble
 from ops.charm import CharmBase, CollectStatusEvent
 from ops.framework import BoundEvent, Object
 from ops.main import main
-from ops.model import ActiveStatus, BlockedStatus, OpenedPort, WaitingStatus
+from ops.model import ActiveStatus, BlockedStatus, WaitingStatus
 from ops.pebble import PathError, ProtocolError
-
-LOKI_DIR = "/loki"
 
 # Log messages can be retrieved using juju debug-log
 logger = logging.getLogger(__name__)
 
 
-@trace_charm(
-    tracing_endpoint="tempo_endpoint",
-    server_cert="server_cert_path",
-    extra_types=[
-        LokiClusterRequirer,
-    ],
-    # TODO add certificate file once TLS support is merged
-)
 class LokiWorkerK8SOperatorCharm(CharmBase):
     """A Juju Charmed Operator for Loki."""
 
     _name = "loki"
-    _instance_addr = "127.0.0.1"
     _port = 3100
 
     def __init__(self, *args):
@@ -69,8 +56,7 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
                 self.on["loki-cluster"].relation_changed,
             ],
         )
-        self._set_ports()
-        self.tracing = TracingEndpointRequirer(self)
+        self.unit.set_ports(self._port)
 
         # === EVENT HANDLER REGISTRATION === #
         self.framework.observe(self.on.loki_pebble_ready, self._on_pebble_ready)  # pyright: ignore
@@ -163,14 +149,6 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         return None
 
     @property
-    def tempo_endpoint(self) -> Optional[str]:
-        """Tempo endpoint for charm tracing."""
-        if self.tracing.is_ready():
-            return self.tracing.otlp_http_endpoint()
-        else:
-            return None
-
-    @property
     def server_cert_path(self) -> Optional[str]:
         """Server certificate path for tls tracing."""
         return LOKI_CERT_FILE
@@ -181,7 +159,7 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         """Share via loki-cluster all information we need to publish."""
         self.loki_cluster.publish_unit_address(socket.getfqdn())
         if self.unit.is_leader() and self._loki_roles:
-            logger.info(f"publishing roles: {self._loki_roles}")
+            logger.info(f"Publishing Loki roles: {self._loki_roles} to relation databag.")
             self.loki_cluster.publish_app_roles(self._loki_roles)
 
     def _update_config(self):
@@ -218,22 +196,6 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
             return True
 
         return False
-
-    def _set_ports(self):
-        """Open necessary (and close no longer needed) workload ports."""
-        planned_ports = {
-            OpenedPort("tcp", self._port),
-        }
-        actual_ports = self.unit.opened_ports()
-
-        # Ports may change across an upgrade, so need to sync
-        ports_to_close = actual_ports.difference(planned_ports)
-        for p in ports_to_close:
-            self.unit.close_port(p.protocol, p.port)
-
-        new_ports_to_open = planned_ports.difference(actual_ports)
-        for p in new_ports_to_open:
-            self.unit.open_port(p.protocol, p.port)
 
     def _update_tls_certificates(self) -> bool:
         if not self._container.can_connect():

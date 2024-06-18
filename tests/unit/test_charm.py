@@ -13,8 +13,8 @@ from ops.testing import Harness
 ops.testing.SIMULATE_CAN_CONNECT = True
 
 
-@patch("charm.LokiWorkerK8SOperatorCharm._loki_version", property(lambda *_: "1.2.3"))
-@patch("charm.LokiWorkerK8SOperatorCharm.restart", lambda *_: True)
+@patch("charm.Loki.version", property(lambda *_: "1.2.3"))
+@patch("charm.Loki.restart", lambda *_: True)
 class TestCharm(unittest.TestCase):
     def setUp(self, *unused):
         self.harness = Harness(LokiWorkerK8SOperatorCharm)

@@ -3,7 +3,7 @@ from charm import LokiWorkerK8SOperatorCharm
 from scenario import Context, ExecOutput
 
 
-g@pytest.fixture
+@pytest.fixture
 def ctx():
     return Context(LokiWorkerK8SOperatorCharm)
 

@@ -22,10 +22,6 @@ log = logging.getLogger("loki_cluster")
 
 DEFAULT_ENDPOINT_NAME = "loki-cluster"
 BUILTIN_JUJU_KEYS = {"ingress-address", "private-address", "egress-subnets"}
-LOKI_CONFIG_FILE = "/etc/loki/loki-config.yaml"
-LOKI_CERT_FILE = "/etc/loki/server.cert"
-LOKI_KEY_FILE = "/etc/loki/private.key"
-LOKI_CLIENT_CA_FILE = "/etc/loki/ca.cert"
 
 
 # TODO: inherit enum.StrEnum when jammy is no longer supported.

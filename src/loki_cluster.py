@@ -10,7 +10,7 @@ As this relation is cluster-internal and not intended for third-party charms to 
 import json
 import logging
 from enum import Enum, unique
-from typing import Any, Dict, Iterable, List, MutableMapping, Optional, Set
+from typing import Any, Dict, Iterable, List, MutableMapping, Optional
 from urllib.parse import urlparse
 
 import ops
@@ -36,20 +36,6 @@ class LokiRole(str, Enum):
     write = "write"
     backend = "backend"
     all = "all"
-
-
-META_ROLES = {}
-
-
-def expand_roles(roles: Iterable[LokiRole]) -> Set[LokiRole]:
-    """Expand any meta roles to their 'atomic' equivalents."""
-    expanded_roles = set()
-    for role in roles:
-        if role in META_ROLES:
-            expanded_roles.update(META_ROLES[role])
-        else:
-            expanded_roles.add(role)
-    return expanded_roles
 
 
 class ConfigReceivedEvent(ops.EventBase):
@@ -279,8 +265,7 @@ class LokiClusterRequirer(Object):
 
         relation = self.relation
         if relation:
-            deduplicated_roles = list(expand_roles(roles))
-            databag_model = LokiClusterRequirerAppData(roles=deduplicated_roles)
+            databag_model = LokiClusterRequirerAppData(roles=list(roles))
             databag_model.dump(relation.data[self.model.app])
 
     def _get_data_from_coordinator(self) -> Optional[LokiClusterProviderAppData]:

@@ -41,9 +41,6 @@ class LokiRole(str, Enum):
 class ConfigReceivedEvent(ops.EventBase):
     """Event emitted when the "loki-cluster" provider has shared a new loki config."""
 
-    config: Dict[str, Any]
-    """The loki config."""
-
     def __init__(self, handle: ops.framework.Handle, config: Dict[str, Any]):
         super().__init__(handle)
         self.config = config

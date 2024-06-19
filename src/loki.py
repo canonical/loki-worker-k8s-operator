@@ -96,6 +96,10 @@ class Loki:
         Raises: BlockedStatusError exception if PebbleError, ProtocolError, PathError exceptions
             are raised by container.remove_path
         """
+        if not self._container.can_connect():
+            logger.debug("Could not connect to Loki container")
+            return False
+
         if not config:
             logger.warning("cannot update loki config: coordinator hasn't published one yet.")
             return False

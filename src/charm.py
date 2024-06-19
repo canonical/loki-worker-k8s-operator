@@ -34,8 +34,6 @@ logger = logging.getLogger(__name__)
 class LokiWorkerK8SOperatorCharm(CharmBase):
     """A Juju Charmed Operator for Loki."""
 
-    _loki = None
-
     def __init__(self, *args):
         super().__init__(*args)
         self._container = self.unit.get_container(CONTAINER_NAME)
@@ -45,10 +43,6 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         self._log_forwarder = ManualLogForwarder(
             charm=self,
             loki_endpoints=self._loki_cluster.get_loki_endpoints(),
-            refresh_events=[
-                self.on["loki-cluster"].relation_joined,
-                self.on["loki-cluster"].relation_changed,
-            ],
         )
         self.unit.set_ports(self._loki.port)
 
@@ -67,6 +61,15 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         self.framework.observe(
             self.on.loki_cluster_relation_broken, self._log_forwarder.disable_logging
         )
+        self.framework.observe(
+            self.on["loki-cluster"].relation_joined, self._update_loki_endpoints
+        )
+        self.framework.observe(
+            self.on["loki-cluster"].relation_changed, self._update_loki_endpoints
+        )
+        self.framework.observe(
+            self.on["loki-cluster"].relation_departed, self._update_loki_endpoints
+        )
 
     # === EVENT HANDLERS === #
     def _on_pebble_ready(self, _):
@@ -83,6 +86,9 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         if self._loki_cluster.get_loki_config():
             # determine if a workload restart is necessary
             self._update_config()
+
+    def _update_loki_endpoints(self, _):
+        self._log_forwarder.update_endpoints(self._loki_cluster.get_loki_endpoints())
 
     def _on_upgrade_charm(self, _):
         self._update_loki_cluster()
@@ -192,12 +198,13 @@ class ManualLogForwarder(Object):
             return
 
         for event in refresh_events:
-            self.framework.observe(event, self.update_logging)
+            self.framework.observe(event, self._update_logging)
 
-    def update_logging(self, _=None):
+    def _update_logging(self, _=None):
+        self.update_endpoints(self._loki_endpoints)
+
+    def update_endpoints(self, loki_endpoints):
         """Update the log forwarding to match the active Loki endpoints."""
-        loki_endpoints = self._loki_endpoints
-
         if not loki_endpoints:
             logger.warning("No Loki endpoints available")
             loki_endpoints = {}

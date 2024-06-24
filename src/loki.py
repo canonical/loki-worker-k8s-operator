@@ -2,7 +2,7 @@
 # Copyright 2024 Canonical
 # See LICENSE file for licensing details.
 
-"""Assist with client interactions with Loki."""
+"""Loki workload manager class."""
 
 import json
 import logging

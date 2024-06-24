@@ -1,0 +1,79 @@
+# Copyright 2024 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+name: loki-worker-k8s
+type: charm
+assumes:
+  - k8s-api
+  - juju >= 3.5.0
+
+summary: Loki for Kubernetes clusters.
+description: |
+  Grafana Loki is an open source software project that provides a scalable long-term storage for Prometheus.
+  This charm deploys and operates Loki on Kubernetes clusters
+
+# TODO: Write documentation
+# docs: https://discourse.charmhub.io/t/mimir-worker-k8s-index/13464
+# source: https://github.com/canonical/mimir-worker-k8s-operator
+# issues: https://github.com/canonical/mimir-worker-k8s-operator/issues
+
+bases:
+  - build-on:
+    - name: ubuntu
+      channel: "22.04"
+    run-on:
+    - name: ubuntu
+      channel: "22.04"
+
+parts:
+  charm:
+    charm-binary-python-packages:
+      - "pydantic>=2"
+      - "cryptography"
+      - "jsonschema"
+
+requires:
+  loki-cluster:
+    interface: loki_cluster
+    limit: 1
+
+  tracing:
+    interface: tracing
+    limit: 1
+    description: |
+      Enables sending traces to the tracing backend
+
+
+storage:
+  loki-persisted:
+    type: filesystem
+    description: Mount point in which Loki will store data.
+
+containers:
+  loki:
+    resource: loki-image
+    mounts:
+      - storage: loki-persisted
+        location: /loki/persisted
+
+resources:
+  loki-image:
+    type: oci-image
+    description: OCI image for Grafana Loki
+    upstream-source: docker.io/ubuntu/loki:3.0-22.04
+
+# Based on: https://grafana.com/docs/loki/latest/get-started/deployment-modes/#simple-scalable
+config:
+  options:
+    read:
+      type: boolean
+      default: false
+    write:
+      type: boolean
+      default: false
+    backend:
+      type: boolean
+      default: false
+    all:
+      type: boolean
+      default: false

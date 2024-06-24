@@ -1,0 +1,12 @@
+*~
+*swp
+*.charm
+.coverage
+.tox
+__pycache__
+build
+venv
+.idea
+*.egg-info/
+.vscode
+.hypothesis/*

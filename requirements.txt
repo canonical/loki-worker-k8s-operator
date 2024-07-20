@@ -2,6 +2,7 @@ ops
 cosl
 lightkube
 lightkube-models
+cryptography
 
 # Charm relation interfaces
 pydantic

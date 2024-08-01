@@ -31,7 +31,7 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
             charm=self,
             name="loki",
             pebble_layer=self.pebble_layer,
-            endpoints={"cluster": "loki-cluster", "tracing": "tracing"},
+            endpoints={"cluster": "loki-cluster"},
         )
         self._container = self.unit.get_container(CONTAINER_NAME)
         self.unit.set_ports(LOKI_PORT)

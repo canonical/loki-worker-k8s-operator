@@ -86,7 +86,7 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
                     "loki": {
                         "override": "replace",
                         "summary": "loki worker daemon",
-                        "command": f"/bin/loki --config.file={CONFIG_FILE} -target {targets} -auth.multitenancy-enabled=false",
+                        "command": f"/bin/loki --config.file={CONFIG_FILE} -target {targets}",
                         "startup": "enabled",
                     }
                 },

@@ -65,15 +65,15 @@ resources:
 # Based on: https://grafana.com/docs/loki/latest/get-started/deployment-modes/#simple-scalable
 config:
   options:
-    read:
+    role-read:
       type: boolean
       default: false
-    write:
+    role-write:
       type: boolean
       default: false
-    backend:
+    role-backend:
       type: boolean
       default: false
-    all:
+    role-all:
       type: boolean
       default: false

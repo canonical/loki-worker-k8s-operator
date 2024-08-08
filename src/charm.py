@@ -10,7 +10,7 @@ import logging
 import re
 from typing import Optional
 
-from cosl.coordinated_workers.worker import CERT_FILE, CONFIG_FILE, Worker
+from cosl.coordinated_workers.worker import CONFIG_FILE, Worker
 from ops.charm import CharmBase
 from ops.main import main
 from ops.pebble import Layer
@@ -27,7 +27,7 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
-        self._worker = Worker(
+        self.worker = Worker(
             charm=self,
             name="loki",
             pebble_layer=self.pebble_layer,
@@ -47,17 +47,6 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         )
 
     # === PROPERTIES === #
-
-    @property
-    def server_cert_path(self) -> Optional[str]:
-        """Server certificate path for tls tracing."""
-        return CERT_FILE
-
-    @property
-    def tempo_endpoint(self) -> Optional[str]:
-        """Tempo endpoint for charm tracing."""
-        if self._worker.tracing.is_ready():
-            return self._worker.tracing.get_endpoint(protocol="otlp_http")
 
     @property
     def version(self) -> Optional[str]:
@@ -86,7 +75,7 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
                     "loki": {
                         "override": "replace",
                         "summary": "loki worker daemon",
-                        "command": f"/bin/loki --config.file={CONFIG_FILE} -target {targets} -auth.multitenancy-enabled=false",
+                        "command": f"/bin/loki --config.file={CONFIG_FILE} -target {targets}",
                         "startup": "enabled",
                     }
                 },

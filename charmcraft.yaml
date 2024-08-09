@@ -5,7 +5,7 @@ name: loki-worker-k8s
 type: charm
 assumes:
   - k8s-api
-  - juju >= 3.5.0
+  - juju >= 3.4.5
 
 summary: Loki for Kubernetes clusters.
 description: |

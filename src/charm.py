@@ -32,6 +32,7 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
             name="loki",
             pebble_layer=self.pebble_layer,
             endpoints={"cluster": "loki-cluster"},
+            readiness_check_endpoint=f"http://localhost:{LOKI_PORT}/ready",
         )
         self._container = self.unit.get_container(CONTAINER_NAME)
         self.unit.set_ports(LOKI_PORT)

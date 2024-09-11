@@ -12,10 +12,10 @@ description: |
   Grafana Loki is an open source software project that provides a scalable long-term storage for Prometheus.
   This charm deploys and operates Loki on Kubernetes clusters
 
-# TODO: Write documentation
-# docs: https://discourse.charmhub.io/t/mimir-worker-k8s-index/13464
-# source: https://github.com/canonical/mimir-worker-k8s-operator
-# issues: https://github.com/canonical/mimir-worker-k8s-operator/issues
+website: https://charmhub.io/loki-worker-k8s
+source: https://github.com/canonical/coordinatorloki-worker-k8s-operator
+issues: https://github.com/canonical/loki-coordinatorworker-k8s-operator/issues
+docs: https://discourse.charmhub.icoordinatoro/t/loki-worker-k8s-operator-docs-index/15536
 
 bases:
   - build-on:

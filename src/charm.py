@@ -8,6 +8,7 @@
 
 import logging
 import re
+import socket
 from typing import Optional
 
 from cosl.coordinated_workers.worker import CONFIG_FILE, Worker
@@ -32,7 +33,7 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
             name="loki",
             pebble_layer=self.pebble_layer,
             endpoints={"cluster": "loki-cluster"},
-            readiness_check_endpoint=f"http://localhost:{LOKI_PORT}/ready",
+            readiness_check_endpoint=self.readiness_check_endpoint,
         )
         self._container = self.unit.get_container(CONTAINER_NAME)
         self.unit.set_ports(LOKI_PORT)
@@ -63,6 +64,12 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         return None
 
     # === UTILITY METHODS === #
+
+    @staticmethod
+    def readiness_check_endpoint(worker: Worker) -> str:
+        """Endpoint for worker readiness checks."""
+        scheme = "https" if worker.cluster.get_tls_data() else "http"
+        return f"{scheme}://{socket.getfqdn()}:{LOKI_PORT}/ready"
 
     def pebble_layer(self, worker: Worker) -> Layer:
         """Return a dictionary representing a Pebble layer."""

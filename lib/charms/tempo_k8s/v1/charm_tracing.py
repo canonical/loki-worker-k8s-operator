@@ -14,16 +14,16 @@ https://charmhub.io/tempo-coordinator-k8s/libraries/charm_tracing
 
 to install it:
 
-> charmcraft fetch-lib charms.tempo_coordinator_k8s.v0.tracing
+> charmcraft fetch-lib charms.tempo_coordinator_k8s.v0.charm_tracing
 
 The API is unchanged, so you can search and replace the path to swap the old lib with the new one.
 """
 
 LIBID = "cb1705dcd1a14ca09b2e60187d1215c7"
 LIBAPI = 1
-LIBPATCH = 16
+LIBPATCH = 17
 
 raise DeprecationWarning(
-    "this charm lib is deprecated; please use charms.tempo_coordinator_k8s.v0.tracing instead. "
+    "this charm lib is deprecated; please use charms.tempo_coordinator_k8s.v0.charm_tracing instead. "
     "see https://charmhub.io/tempo-coordinator-k8s/libraries/charm_tracing"
 )

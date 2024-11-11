@@ -11,7 +11,8 @@ import re
 import socket
 from typing import Optional
 
-from cosl.coordinated_workers.worker import CONFIG_FILE, Worker
+from charms.tempo_coordinator_k8s.v0.charm_tracing import trace_charm
+from cosl.coordinated_workers.worker import CONFIG_FILE, ROOT_CA_CERT, Worker
 from ops.charm import CharmBase
 from ops.main import main
 from ops.pebble import Layer
@@ -23,6 +24,11 @@ CONTAINER_NAME = "loki"
 LOKI_PORT = 3100
 
 
+@trace_charm(
+    tracing_endpoint="tempo_endpoint",
+    server_cert="ca_cert_path",
+    extra_types=[Worker],
+)
 class LokiWorkerK8SOperatorCharm(CharmBase):
     """A Juju Charmed Operator for Loki."""
 
@@ -49,6 +55,16 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         )
 
     # === PROPERTIES === #
+    @property
+    def tempo_endpoint(self) -> Optional[str]:
+        """Tempo endpoint for charm tracing."""
+        if endpoints := self.worker.cluster.get_tracing_receivers():
+            return endpoints.get("otlp_http")
+
+    @property
+    def ca_cert_path(self) -> Optional[str]:
+        """CA certificate path for tls tracing."""
+        return ROOT_CA_CERT
 
     @property
     def version(self) -> Optional[str]:

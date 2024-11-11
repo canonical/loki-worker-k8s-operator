@@ -38,13 +38,6 @@ requires:
     interface: loki_cluster
     limit: 1
 
-  tracing:
-    interface: tracing
-    limit: 1
-    description: |
-      Enables sending traces to the tracing backend
-
-
 storage:
   loki-persisted:
     type: filesystem

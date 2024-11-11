@@ -75,6 +75,8 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         """Return a dictionary representing a Pebble layer."""
         targets = ",".join(sorted(worker.roles))
 
+        tempo_endpoint = worker.cluster.get_tracing_receivers().get("jaeger_thrift_http", None)
+        topology = worker.cluster.juju_topology
         return Layer(
             {
                 "summary": "loki worker layer",
@@ -85,6 +87,18 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
                         "summary": "loki worker daemon",
                         "command": f"/bin/loki --config.file={CONFIG_FILE} -target {targets}",
                         "startup": "enabled",
+                        # configure workload traces
+                        "environment": {
+                            "JAEGER_ENDPOINT": (
+                                f"{tempo_endpoint}/api/traces?format=jaeger.thrift"
+                                if tempo_endpoint
+                                else ""
+                            ),
+                            "JAEGER_SAMPLER_PARAM": "1",
+                            "JAEGER_SAMPLER_TYPE": "const",
+                            "JAEGER_TAGS": f"juju_application={topology.application},juju_model={topology.model}"
+                            + f",juju_model_uuid={topology.model_uuid},juju_unit={topology.unit},juju_charm={topology.charm_name}",
+                        },
                     }
                 },
             }

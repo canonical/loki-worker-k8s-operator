@@ -6,7 +6,6 @@ output "endpoints" {
   value = {
     # Requires
     loki_cluster = "loki-cluster"
-    
     # Provides
   }
 }

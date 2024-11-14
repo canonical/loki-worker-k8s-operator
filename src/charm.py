@@ -11,6 +11,7 @@ import re
 import socket
 from typing import Optional
 
+from charms.tempo_coordinator_k8s.v0.charm_tracing import trace_charm
 from cosl.coordinated_workers.worker import CONFIG_FILE, Worker
 from ops.charm import CharmBase
 from ops.main import main
@@ -23,6 +24,11 @@ CONTAINER_NAME = "loki"
 LOKI_PORT = 3100
 
 
+@trace_charm(
+    tracing_endpoint="_charm_tracing_endpoint",
+    server_cert="_charm_tracing_cert",
+    extra_types=[Worker],
+)
 class LokiWorkerK8SOperatorCharm(CharmBase):
     """A Juju Charmed Operator for Loki."""
 
@@ -35,6 +41,8 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
             endpoints={"cluster": "loki-cluster"},
             readiness_check_endpoint=self.readiness_check_endpoint,
         )
+        self._charm_tracing_endpoint, self._charm_tracing_cert = self.worker.charm_tracing_config()
+
         self._container = self.unit.get_container(CONTAINER_NAME)
         self.unit.set_ports(LOKI_PORT)
 
@@ -75,6 +83,21 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
         """Return a dictionary representing a Pebble layer."""
         targets = ",".join(sorted(worker.roles))
 
+        # configure workload traces
+        env = {}
+        if tempo_endpoint := worker.cluster.get_workload_tracing_receivers().get(
+            "jaeger_thrift_http", None
+        ):
+            topology = worker.cluster.juju_topology
+            env.update(
+                {
+                    "JAEGER_ENDPOINT": (f"{tempo_endpoint}/api/traces?format=jaeger.thrift"),
+                    "JAEGER_SAMPLER_PARAM": "1",
+                    "JAEGER_SAMPLER_TYPE": "const",
+                    "JAEGER_TAGS": f"juju_application={topology.application},juju_model={topology.model}"
+                    + f",juju_model_uuid={topology.model_uuid},juju_unit={topology.unit},juju_charm={topology.charm_name}",
+                },
+            )
         return Layer(
             {
                 "summary": "loki worker layer",
@@ -85,6 +108,7 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
                         "summary": "loki worker daemon",
                         "command": f"/bin/loki --config.file={CONFIG_FILE} -target {targets}",
                         "startup": "enabled",
+                        "environment": env,
                     }
                 },
             }

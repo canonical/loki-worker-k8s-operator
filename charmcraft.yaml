@@ -12,6 +12,7 @@ description: |
   Grafana Loki is an open source software project that provides a scalable long-term storage for Prometheus.
   This charm deploys and operates Loki on Kubernetes clusters
 
+
 links:
   website: https://charmhub.io/loki-worker-k8s
   source: https://github.com/canonical/loki-worker-k8s-operator

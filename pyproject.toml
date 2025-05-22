@@ -7,11 +7,10 @@ requires-python = "~=3.8"
 
 dependencies = [
   "ops",
-  "cosl",
-  "lightkube",
-  "lightkube-models",
-  "cryptography",
-  "jsonschema",
+  # FIXME: use cosl from pypi
+  "cosl@git+https://github.com/canonical/cos-lib@migrate-coord-workers",
+  # FIXME: use coordinated-worker from pypi
+  "coordinated-workers@git+https://github.com/canonical/cos-coordinated-workers@migrate-coord-workers",
   "pydantic>=2",
   "opentelemetry-exporter-otlp-proto-http",
 ]

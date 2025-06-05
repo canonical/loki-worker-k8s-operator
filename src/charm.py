@@ -13,7 +13,7 @@ import socket
 from typing import Optional
 
 from charms.tempo_coordinator_k8s.v0.charm_tracing import trace_charm
-from cosl.coordinated_workers.worker import CONFIG_FILE, Worker
+from coordinated_workers.worker import CONFIG_FILE, Worker
 from ops.charm import CharmBase
 from ops.main import main
 from ops.pebble import Layer

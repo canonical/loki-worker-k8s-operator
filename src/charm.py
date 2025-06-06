@@ -8,10 +8,9 @@
 
 import logging
 import os
-import re
 import socket
-from typing import Optional
 
+import tenacity
 from charms.tempo_coordinator_k8s.v0.charm_tracing import trace_charm
 from coordinated_workers.worker import CONFIG_FILE, Worker
 from ops.charm import CharmBase
@@ -24,6 +23,8 @@ logger = logging.getLogger(__name__)
 CONTAINER_NAME = "loki"
 LOKI_PORT = 3100
 
+_LEGACY_WORKER_PORTS = [LOKI_PORT]
+
 
 @trace_charm(
     tracing_endpoint="_charm_tracing_endpoint",
@@ -35,42 +36,39 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
 
     def __init__(self, *args):
         super().__init__(*args)
+        # Override waiting times from the generic worker
+        Worker.SERVICE_START_RETRY_STOP = tenacity.stop_after_delay(60)
+        Worker.SERVICE_START_RETRY_WAIT = tenacity.wait_fixed(5)
+
         self.worker = Worker(
             charm=self,
-            name="loki",
+            # name of the container the worker is operating on AND of the executable
+            name=CONTAINER_NAME,
             pebble_layer=self.pebble_layer,
             endpoints={"cluster": "loki-cluster"},
             readiness_check_endpoint=self.readiness_check_endpoint,
+            resources_requests=lambda _: {"cpu": "50m", "memory": "200Mi"},
+            # container we want to resource-patch
+            container_name=CONTAINER_NAME,
         )
         self._charm_tracing_endpoint, self._charm_tracing_cert = self.worker.charm_tracing_config()
 
         self._container = self.unit.get_container(CONTAINER_NAME)
-        self.unit.set_ports(LOKI_PORT)
 
-        # === EVENT HANDLER REGISTRATION === #
-        self.framework.observe(self.on.loki_pebble_ready, self._on_pebble_ready)  # pyright: ignore
-
-    # === EVENT HANDLERS === #
-
-    def _on_pebble_ready(self, _):
-        self.unit.set_workload_version(
-            self.version or ""  # pyright: ignore[reportOptionalMemberAccess]
-        )
-
-    # === PROPERTIES === #
-
-    @property
-    def version(self) -> Optional[str]:
-        """Return Loki workload version."""
-        if not self._container.can_connect():
-            return None
-
-        version_output, _ = self._container.exec(["/bin/loki", "-version"]).wait_output()
-        # Output looks like this:
-        # Loki, version 2.4.0 (branch: HEAD, revision 32137ee)
-        if result := re.search(r"[Vv]ersion:?\s*(\S+)", version_output):
-            return result.group(1)
-        return None
+        # if the worker has received some ports from the coordinator,
+        # it's in charge of ensuring they're opened.
+        if not self.worker.cluster.get_worker_ports():
+            # legacy behaviour fallback: older interface versions didn't tell us which
+            # ports we should be opening, so we opened all of them.
+            # This can happen when talking to an old coordinator revision, or
+            # if the coordinator hasn't published its data yet.
+            logger.info(
+                "Cluster interface hasn't published a list of worker ports (yet?). "
+                "If this issue persists after the cluster has settled, you should "
+                "upgrade the coordinator to a newer revision. Falling back now to "
+                "legacy behaviour and opening all ports."
+            )
+            self.unit.set_ports(*_LEGACY_WORKER_PORTS)
 
     # === UTILITY METHODS === #
 

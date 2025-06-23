@@ -11,6 +11,7 @@ import os
 import socket
 
 import tenacity
+from charms.istio_beacon_k8s.v0.service_mesh import Endpoint, Method, Policy, ServiceMeshConsumer
 from charms.tempo_coordinator_k8s.v0.charm_tracing import trace_charm
 from coordinated_workers.worker import CONFIG_FILE, Worker
 from ops.charm import CharmBase
@@ -70,6 +71,19 @@ class LokiWorkerK8SOperatorCharm(CharmBase):
             )
             self.unit.set_ports(*_LEGACY_WORKER_PORTS)
 
+        self._mesh = ServiceMeshConsumer(
+            self,
+            policies=[
+                Policy(
+                    relation="loki-cluster",
+                    endpoints=[
+                        Endpoint(
+                            ports=[LOKI_PORT],
+                        ),
+                    ],
+                ),
+            ],
+        )
     # === UTILITY METHODS === #
 
     @staticmethod

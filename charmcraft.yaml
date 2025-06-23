@@ -48,6 +48,13 @@ storage:
     type: filesystem
     description: Mount point in which Loki will store data.
 
+provides:
+  provide-cmr-mesh:
+    interface: cross_model_mesh
+    description: |
+      Access a cross-model application from loki worker via the service mesh.
+      This relation provides additional data required by the service mesh to enforce cross-model authorization policies
+
 requires:
   loki-cluster:
     interface: loki_cluster
@@ -56,7 +63,16 @@ requires:
     description: |
       Integrate with a coordinator charm to receive a config and be part 
       of a Loki HA cluster.
-
+  service-mesh:
+    limit: 1
+    interface: service_mesh
+    description: |
+      Subscribe this charm into a service mesh to enforce authorization policies.
+  require-cmr-mesh:
+    interface: cross_model_mesh
+    description: |
+      Allow a cross-model application access to loki worker via the service mesh.
+      This relation provides additional data required by the service mesh to enforce cross-model authorization policies.
 
 # Based on: https://grafana.com/docs/loki/latest/get-started/deployment-modes/#simple-scalable
 config:

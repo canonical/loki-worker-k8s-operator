@@ -6,11 +6,8 @@ version = "0.0"
 requires-python = "~=3.8"
 
 dependencies = [
-  "ops",
-  "cosl>=1.0",
-  "coordinated-workers",
-  "pydantic>=2",
-  "opentelemetry-exporter-otlp-proto-http",
+  # TODO: use a tagged version 
+  "coordinated-workers@git+https://github.com/canonical/cos-coordinated-workers@TAP-359",
 ]
 
 [project.optional-dependencies]

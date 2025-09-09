@@ -6,8 +6,7 @@ version = "0.0"
 requires-python = "~=3.8"
 
 dependencies = [
-  # TODO: use a tagged version 
-  "coordinated-workers@git+https://github.com/canonical/cos-coordinated-workers@TAP-359",
+  "coordinated-workers>=2.0.14",
 ]
 
 [project.optional-dependencies]

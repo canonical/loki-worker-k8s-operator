@@ -1113,7 +1113,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "codespell", marker = "extra == 'dev'" },
-    { name = "coordinated-workers", specifier = ">=2.0.14" },
+    { name = "coordinated-workers" },
     { name = "coverage", extras = ["toml"], marker = "extra == 'dev'" },
     { name = "juju", marker = "extra == 'dev'" },
     { name = "ops", extras = ["testing"], marker = "extra == 'dev'" },

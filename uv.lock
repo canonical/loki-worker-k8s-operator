@@ -375,8 +375,8 @@ wheels = [
 
 [[package]]
 name = "coordinated-workers"
-version = "2.0.25"
-source = { git = "https://github.com/canonical/cos-coordinated-workers.git?rev=feature%2Fmesh#3c36587758fb56871fca40849e1b3b9a32991f9f" }
+version = "2.1.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "charmed-service-mesh-helpers" },
     { name = "cosl" },
@@ -386,6 +386,10 @@ dependencies = [
     { name = "lightkube-extensions" },
     { name = "ops", extra = ["tracing"] },
     { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/04/4f/100baaf43a2bb925285bfabea882a978e4e44a7ec603e363171ebb2e17ef/coordinated_workers-2.1.0.tar.gz", hash = "sha256:250b963eb7ff5ef5a1508c59207c072de039ce8bb62104fefd98fc41a04112b9", size = 414645, upload-time = "2025-10-20T17:37:18.704Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/28/2e/0e564c9f01cc8051fdb7f0c4d4c097325afbc521b3ed70e3183dba8df363/coordinated_workers-2.1.0-py3-none-any.whl", hash = "sha256:9cf2dd97da376a698c0a0d21960238278c0ade8c96042093c82bb16c652eef0f", size = 59066, upload-time = "2025-10-20T17:37:17.159Z" },
 ]
 
 [[package]]
@@ -878,11 +882,15 @@ wheels = [
 
 [[package]]
 name = "lightkube-extensions"
-version = "0.0.1"
-source = { git = "https://github.com/canonical/lightkube-extensions.git?rev=0.1.0#f82588c9f9b981fef931cc06441fd8df6e162fee" }
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jinja2" },
     { name = "lightkube" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f8/e9/dd72ae3d124426d5b29c2e75f88131e11de8c59207697226eaf52bc72c61/lightkube_extensions-0.1.0.tar.gz", hash = "sha256:f112d077697ffb49ceb6ec48b2db33bb864e5660d744dbebf7f34d97cdf138cc", size = 17020, upload-time = "2025-10-20T16:37:22.555Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9d/b9/964fb1788b55018a0ed89735b7c0e3a4c02b63b3cbfabeb9144b48ebd76a/lightkube_extensions-0.1.0-py3-none-any.whl", hash = "sha256:556a9ccf2c551ff9654908ca7ed1077fc622d91fc1d2bd44b6719d7e708dc403", size = 17722, upload-time = "2025-10-20T16:37:21.564Z" },
 ]
 
 [[package]]
@@ -920,10 +928,10 @@ dev = [
 requires-dist = [
     { name = "charmed-service-mesh-helpers", specifier = ">=0.2.0" },
     { name = "codespell", marker = "extra == 'dev'" },
-    { name = "coordinated-workers", git = "https://github.com/canonical/cos-coordinated-workers.git?rev=feature%2Fmesh" },
+    { name = "coordinated-workers" },
     { name = "coverage", extras = ["toml"], marker = "extra == 'dev'" },
     { name = "juju", marker = "extra == 'dev'" },
-    { name = "lightkube-extensions", git = "https://github.com/canonical/lightkube-extensions.git?rev=0.1.0" },
+    { name = "lightkube-extensions" },
     { name = "ops", extras = ["testing"], marker = "extra == 'dev'" },
     { name = "pyright", marker = "extra == 'dev'" },
     { name = "pytest", marker = "extra == 'dev'" },

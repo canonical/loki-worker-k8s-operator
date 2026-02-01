@@ -41,7 +41,7 @@ resources:
   loki-image:
     type: oci-image
     description: OCI image for Grafana Loki
-    upstream-source: docker.io/ubuntu/loki@sha256:18de9c8e960ab258f468f424c4f35b39f57752640ad38d75007f12119e59a9af  # renovate: oci-image tag: 3.5-24.04
+    upstream-source: docker.io/ubuntu/loki@sha256:877c5a23ab92e1c66e81374d293c65a6ced4525aea6954ef8a131fcde56b708c  # renovate: oci-image tag: 3.5-24.04
 
 storage:
   loki-persisted:

@@ -1,0 +1,87 @@
+# Copyright 2024 Canonical Ltd.
+# See LICENSE file for licensing details.
+name: loki-worker-k8s
+type: charm
+summary: Loki for Kubernetes clusters.
+description: |
+  Grafana Loki is an open source software project that provides a scalable long-term storage for Prometheus.
+  This charm deploys and operates Loki on Kubernetes clusters
+
+links:
+  documentation: https://discourse.charmhub.io/t/loki-worker-k8s-operator-docs-index/15536
+  website: https://charmhub.io/loki-worker-k8s
+  source: https://github.com/canonical/loki-worker-k8s-operator
+  issues: https://github.com/canonical/loki-worker-k8s-operator/issues
+
+assumes:
+  - k8s-api
+  - juju >= 3.6
+
+platforms:
+  ubuntu@24.04:amd64:
+
+parts:
+  charm:
+    source: .
+    plugin: uv
+    build-packages: [git]
+    build-snaps: [astral-uv]
+    override-build: |
+      craftctl default
+      git describe --always > $CRAFT_PART_INSTALL/version
+
+containers:
+  loki:
+    resource: loki-image
+    mounts:
+      - storage: loki-persisted
+        location: /loki/persisted
+
+resources:
+  loki-image:
+    type: oci-image
+    description: OCI image for Grafana Loki
+    upstream-source: docker.io/ubuntu/loki@sha256:18de9c8e960ab258f468f424c4f35b39f57752640ad38d75007f12119e59a9af  # renovate: oci-image tag: 3.5-24.04
+
+storage:
+  loki-persisted:
+    type: filesystem
+    description: Mount point in which Loki will store data.
+
+requires:
+  loki-cluster:
+    interface: loki_cluster
+    optional: true
+    limit: 1
+    description: |
+      Integrate with a coordinator charm to receive a config and be part 
+      of a Loki HA cluster.
+
+
+# Based on: https://grafana.com/docs/loki/latest/get-started/deployment-modes/#simple-scalable
+config:
+  options:
+    role-read:
+      type: boolean
+      default: false
+      description: |
+        Enable the 'read' meta-role for Loki. This enables the following components:
+        Query Frontend, Querier.
+    role-write:
+      type: boolean
+      default: false
+      description: |
+        Enable the 'write' meta-role for Loki. This enables the following components:
+        Distributor, Ingester.
+    role-backend:
+      type: boolean
+      default: false
+      description: |
+        Enable the 'backend' meta-role for Loki. This enables the following components:
+        Compactor, Index Gateway, Query Scheduler, Ruler.
+    role-all:
+      type: boolean
+      default: false
+      description: |
+        Enables all the default roles for Loki.
+
